@@ -1,0 +1,7 @@
+.statList li {
+  margin-bottom: 5px;
+}
+
+.statList li:nth-child(3) {
+  margin-bottom: 20px;
+}
