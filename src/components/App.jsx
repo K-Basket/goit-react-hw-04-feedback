@@ -1,34 +1,40 @@
+import { useState } from 'react';
 import { FeedbackOptions } from './FeedbackOptions';
 import { Section } from './Section';
 import { Statistics } from './Statistics';
 import { Notification } from './Notification';
-import React, { Component } from 'react';
+import React from 'react';
+// импорт хука useState из React
 
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
+export function App() {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
-  onLeaveFeedback = evt => {
-    const name = evt.target.dataset.action;
+  function onLeaveFeedback(evt) {
+    const name = evt.target.dataset.action; // good
 
-    this.setState(prevState => ({
-      [name]: prevState[name] + 1,
-    }));
-  };
+    // // заменено
+    // this.setState(prevState => ({
+    //   [name]: prevState[name] + 1,
+    // }));
 
-  countTotalFeedback = () => {
-    // let sum = this.props.total;
-    let sum = 0;
-    Object.values(this.state).map(el => (sum += el));
-    return sum;
-  };
+    if (name === 'good') setGood(good + 1);
+    if (name === 'neutral') setNeutral(neutral + 1);
+    if (name === 'bad') setBad(bad + 1);
+  }
 
-  countPositiveFeedbackPercentage = () => {
-    const valueGood = this.state.good;
-    const totalFeedback = this.countTotalFeedback();
+  function countTotalFeedback() {
+    // let sum = 0;
+    // Object.values(this.state).map(el => (sum += el));
+    // return sum;
+
+    return good + neutral + bad;
+  }
+
+  function countPositiveFeedbackPercentage() {
+    const valueGood = good;
+    const totalFeedback = countTotalFeedback();
     let percentage = Math.round((valueGood / totalFeedback) * 100);
 
     if (!totalFeedback) {
@@ -36,33 +42,32 @@ export class App extends Component {
     }
 
     return percentage;
-  };
-
-  render() {
-    return (
-      <>
-        <Section title={'Please leave Feedback'}>
-          <p>React Hooks</p>
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.onLeaveFeedback}
-          />
-        </Section>
-
-        <Section title={'Statistics'}>
-          {this.countTotalFeedback() ? (
-            <Statistics
-              good={this.state.good}
-              neutral={this.state.neutral}
-              bad={this.state.bad}
-              total={this.countTotalFeedback()}
-              positivePercentage={this.countPositiveFeedbackPercentage()}
-            />
-          ) : (
-            <Notification message={'There is no feedback'} />
-          )}
-        </Section>
-      </>
-    );
   }
+
+  return (
+    <>
+      <Section title={'Please leave Feedback'}>
+        <p>React Hooks</p>
+        <FeedbackOptions
+          options={['good', 'neutral', 'bad']}
+          // options={Object.keys(state)}
+          onLeaveFeedback={onLeaveFeedback}
+        />
+      </Section>
+
+      <Section title={'Statistics'}>
+        {countTotalFeedback() ? (
+          <Statistics
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={countTotalFeedback()}
+            positivePercentage={countPositiveFeedbackPercentage()}
+          />
+        ) : (
+          <Notification message={'There is no feedback'} />
+        )}
+      </Section>
+    </>
+  );
 }
